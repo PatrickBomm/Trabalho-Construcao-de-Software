@@ -1,0 +1,33 @@
+version: "3.4"
+networks:
+  grupo2:
+volumes:
+  grupo2-keycloak-data:
+    external: true
+services:
+  # Keycloak
+  keycloak:
+    container_name: keycloak
+    image: jboss/keycloak:latest
+    ports:
+      - 8090:8080
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=a12345678
+      - KEYCLOAK_FRONTEND_URL=http://localhost:8090/auth
+    volumes:
+      - grupo2-keycloak-data:/opt/jboss/keycloak/standalone/data
+    networks:
+      - grupo2
+  # Python
+  python:
+    container_name: python
+    build:
+      context: .
+      dockerfile: DockerFile
+    ports:
+      - 8085:8085
+    networks:
+      - grupo2
+    depends_on:
+      - keycloak
